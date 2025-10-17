@@ -1,8 +1,6 @@
 pipeline {
-    // ✅ Define the build environment using a Docker container
-    agent {
-        docker { image 'maven:3.8.5-openjdk-17' }
-    }
+    // Use the main Jenkins agent by default for all stages
+    agent any
 
     stages {
         stage('1. Checkout Code') {
@@ -12,15 +10,18 @@ pipeline {
         }
 
         stage('2. Build Application') {
+            // ✅ Specify a different agent ONLY for this stage
+            agent {
+                docker { image 'maven:3.8.5-openjdk-17' }
+            }
             steps {
-                // This will now run inside the Maven container and succeed
+                // This command will now run inside the temporary Maven container
                 sh 'mvn clean package -DskipTests'
             }
         }
 
-        // NOTE: The next stage will fail because this container doesn't have Docker installed.
-        // This is expected and we will fix it in the next step.
         stage('3. Build Docker Image') {
+            // This stage runs on the default Jenkins agent, which has Docker access
             steps {
                 script {
                     def imageName = "bookstore-service:${env.BUILD_NUMBER}"

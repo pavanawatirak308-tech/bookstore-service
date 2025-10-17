@@ -7,22 +7,22 @@ pipeline {
     stages {
         stage('1. Checkout Code') {
             steps {
-                // This command pulls the latest code from your Git repository
                 git branch: 'main', url: 'https://github.com/pavanawatirak308-tech/bookstore-service.git'
             }
         }
 
         stage('2. Build Application') {
             steps {
-                // This runs the Maven build to compile the code and create a JAR file
+                // This will now run inside the Maven container and succeed
                 sh 'mvn clean package -DskipTests'
             }
         }
 
+        // NOTE: The next stage will fail because this container doesn't have Docker installed.
+        // This is expected and we will fix it in the next step.
         stage('3. Build Docker Image') {
             steps {
                 script {
-                    // This uses the Dockerfile you created to package the application
                     def imageName = "bookstore-service:${env.BUILD_NUMBER}"
                     sh "docker build -t ${imageName} ."
                     echo "Successfully built Docker image: ${imageName}"

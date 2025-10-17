@@ -1,5 +1,8 @@
 pipeline {
-    agent any
+    // ✅ Define the build environment using a Docker container
+    agent {
+        docker { image 'maven:3.8.5-openjdk-17' }
+    }
 
     stages {
         stage('1. Checkout Code') {
